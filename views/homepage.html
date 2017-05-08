@@ -1,0 +1,116 @@
+<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<div class="container">
+	<div class="row">
+		<div class="col-lg-4"></div>
+		<div class="col-lg-4" style="text-align: center;">
+				<h1>Welcome to the Firing Range. Get ready to shoot!</h1>
+
+		<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+ <form  action="/information"  method="post" >
+<label>First Name</label><input type="text" name="userfirst">
+<label>Last Name</label><input type="text" name="userlast">
+<button class="btn-primary">Enter your name fast!</button>
+ </form>
+		<h2 id = "waitQueue"> Waiting ....... </h2>
+		<h2 id= "fireSignal" class="blink"></h2>
+		<h2 id= "results"></h2>
+		<h3 id = "bestScore"> Best time: 4.963ms - Jacob Han</h3>
+		</div>
+		<img id="begin" src ="shootout.png"></img>
+		<img id="end" src = "congratulation.jpg"></img>
+		<img id="sad" src = "sadman.png"></img>
+
+	</div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+
+
+
+<script>
+        // Load the socket.io library above, then connect to the server.
+        // Because the socket.io server is being run on the same server as your
+        // Express instance, you can connect() without any arguments.
+        var socket = io.connect();
+        socket.on('connect', function() {
+            console.log('connected to server via WebSockets!');
+             $('#end').hide()
+             $('#sad').hide()
+
+        });
+        // When 'new_tweet' events are fired, do something with the packaged tweet
+        socket.on('fire', function() {
+            $('#waitQueue').html("")
+            $('#fireSignal').html("FIRE")
+            playAudio();
+                    });
+
+         socket.on('result', function(time) {
+         	console.log(time)
+            $('#fireSignal').html("")
+            if(time.time < 5){
+            $('#results').html("You beat the best time!!! Your time is " + time.time + ". Nice shootin' " + time.userfirst +" "+ time.userlast + "!");
+            $("#bestScore").html("Best time: " + time.time + " " + time.userfirst + " " + time.userlast);
+                        $('#end').show()
+
+        } else if (time.time < 10){
+        	$('#results').html("Your time is " + time.time + ". Not bad at all, " + time.userfirst +" "+ time.userlast + ".");
+        	            $('#end').show()
+
+        } else {
+        	$('#results').html("Your time is " + time.time + ". Keep practicing, " + time.userfirst +" "+ time.userlast + ", and maybe you'll be a real cowboy one day...");
+        	            $('#sad').show()
+
+        }
+            $('#begin').hide()
+ 
+        });
+</script>
+<script>
+function playAudio(){
+	var mySound = new Audio('pistolfire.wav')
+	mySound.play()
+}
+</script>
+
+<style type="text/css">
+body {  
+	/*background-image: url('shootout.png');*/
+	background-color:#999999;
+}
+
+img{
+	width: 50%;
+	margin: 0 20% 0 20%;
+}
+#waitQueue{
+	color: blue;
+}
+#fireSignal{
+	color:red;
+	font-size: 200px;
+	text-align: center;
+}
+
+#results{
+	font-size: 50px;
+}
+@keyframes blink {
+  50% {
+    opacity: 0.0;
+  }
+}
+@-webkit-keyframes blink {
+  50% {
+    opacity: 0.0;
+  }
+}
+.blink {
+    display: inline;
+    color: inherit;
+    animation: blink 1s steps(1) infinite;
+    -webkit-animation: blink 1s steps(1) infinite;
+}
+}</style>
